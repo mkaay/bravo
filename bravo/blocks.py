@@ -141,12 +141,14 @@ class Item(object):
         "key",
         "name",
         "slot",
+        "block",
     )
 
-    def __init__(self, slot, name, secondary=0):
+    def __init__(self, slot, name, secondary=0, block=None):
 
         self.slot = slot
         self.name = name
+        self.block = block
 
         self.key = (self.slot, secondary)
 
@@ -446,15 +448,17 @@ drops[62] = 61  # Burning Furnace -> Furnace
 drops[78] = 0   # Snow
 
 # Block -> item drops.
-drops[16] = 263 # Coal Ore Block    -> Coal
-drops[26] = 355 # Bed block         -> Bed
-drops[56] = 264 # Diamond Ore Block -> Diamond
-drops[63] = 323 # Sign Post         -> Sign Item
-drops[64] = 324 # Wooden Door       -> Wooden Door Item
-drops[68] = 323 # Wall Sign         -> Sign Item
-drops[71] = 330 # Iron Door         -> Iron Door Item
-drops[83] = 338 # Reed              -> Reed Item
-drops[89] = 348 # Lightstone        -> Lightstone Dust
+drops[16] = 263 # Coal Ore Block     -> Coal
+drops[26] = 355 # Bed block          -> Bed
+drops[55] = 331 # Redstone Wire      -> Redstone
+drops[56] = 264 # Diamond Ore Block  -> Diamond
+drops[63] = 323 # Sign Post          -> Sign Item
+drops[64] = 324 # Wooden Door        -> Wooden Door Item
+drops[68] = 323 # Wall Sign          -> Sign Item
+drops[71] = 330 # Iron Door          -> Iron Door Item
+drops[75] = 76  # Redstone Torch off -> Redstone Torch
+drops[83] = 338 # Reed               -> Reed Item
+drops[89] = 348 # Lightstone         -> Lightstone Dust
 drops[93] = 356 # Redstone-repeater-on  -> Redstone-repeater
 drops[94] = 356 # Redstone-repeater-off -> Redstone-repeater
 
@@ -576,6 +580,12 @@ for i, name in enumerate(item_names):
     item = Item(i, name, **kwargs)
     items[i] = item
     items[name] = item
+
+#redstone fix, dirty
+item = Item(331, "redstone", block=blocks["redstone-wire"])
+
+items[331] = item
+items["redstone"] = item
 
 for i, name in enumerate(special_item_names):
     kwargs = {}

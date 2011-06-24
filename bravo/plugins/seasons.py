@@ -40,6 +40,7 @@ snow_resistant = set([
     blocks["sugar-cane"].slot,
     blocks["torch"].slot,
     blocks["tracks"].slot,
+    blocks["tall-grass"].slot,
     blocks["wall-sign"].slot,
     blocks["water"].slot,
     blocks["wooden-door"].slot,

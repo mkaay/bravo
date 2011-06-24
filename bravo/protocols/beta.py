@@ -811,11 +811,13 @@ class BravoProtocol(BetaServerProtocol):
                 self.player, builddata)
             if not cont:
                 break
-
+        
         # Run the build.
         try:
+            builddata = self.prepare_build(builddata)
             yield maybeDeferred(self.run_build, builddata)
-        except BuildError:
+        except BuildError, e:
+            print e
             return
 
         newblock = builddata.block.slot
@@ -827,7 +829,6 @@ class BravoProtocol(BetaServerProtocol):
         for hook in self.post_build_hooks:
             yield maybeDeferred(hook.post_build_hook, self.player, coords,
                 builddata.block)
-
         # Feed automatons.
         for automaton in self.factory.automatons:
             if newblock in automaton.blocks:
@@ -841,14 +842,18 @@ class BravoProtocol(BetaServerProtocol):
         # Flush damaged chunks.
         for chunk in self.chunks.itervalues():
             self.factory.flush_chunk(chunk)
-
-    def run_build(self, builddata):
+    
+    def prepare_build(self, builddata):
         block, metadata, x, y, z, face = builddata
+        
+        # item to block conversion
+        if builddata.block.slot not in blocks and not block.block is None:
+            block = block.block
 
         # Don't place items as blocks.
-        if block.slot not in blocks:
+        if block.slot not in blocks and block.block is None:
             raise BuildError("Couldn't build item %r as block" % block)
-
+        
         # Check for orientable blocks.
         if not metadata and block.orientable():
             metadata = block.orientation(face)
@@ -879,7 +884,12 @@ class BravoProtocol(BetaServerProtocol):
             z -= 1
         elif face == "+z":
             z += 1
-
+        
+        return BuildData(block, metadata, x, y, z, face)
+    
+    def run_build(self, builddata):
+        block, metadata, x, y, z, face = builddata
+        
         # Set the block and data.
         dl = [self.factory.world.set_block((x, y, z), block.slot)]
         if metadata:
